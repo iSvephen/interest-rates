@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Major Currencies Interest Rates Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .chart-container {
+            width: 80%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="centralBanksChart"></canvas>
+    </div>
+
+    <script>
+        // List of major currency central banks
+        const majorCurrencies = ['FED', 'ECB', 'BOE', 'BOJ', 'SNB', 'BOC', 'RBA', 'RBNZ'];
+
+        // Function to fetch and process data
+        async function fetchAndProcessData() {
+            try {
+                const response = await fetch('central_banks_data.json');
+                const data = await response.json();
+                
+                // Filter for major currencies and sort by current rate
+                const filteredData = data.centralBanks
+                    .filter(bank => majorCurrencies.includes(bank.abbreviation))
+                    .sort((a, b) => parseFloat(b.currentRate) - parseFloat(a.currentRate));
+
+                // Prepare data for the chart
+                const labels = filteredData.map(bank => bank.name);
+                const rates = filteredData.map(bank => parseFloat(bank.currentRate));
+
+                createChart(labels, rates);
+            } catch (error) {
+                console.error('Error fetching or processing data:', error);
+            }
+        }
+
+        // Function to create the chart
+        function createChart(labels, data) {
+            const ctx = document.getElementById('centralBanksChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Current Interest Rates (%)',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Major Currencies - Current Interest Rates'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Interest Rate (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Central Banks'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fetch data and create chart when the page loads
+        fetchAndProcessData();
+    </script>
+</body>
+</html>
