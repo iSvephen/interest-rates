@@ -50,7 +50,8 @@ function runScrape() {
 
 // Run the scraper immediately and then every hour
 runScrape(); // Run it immediately
-setInterval(runScrape, 3600000); // Run it every hour (3600000 ms)
+setInterval(runScrape, 60000); // Run it every 1m (3600000 ms)
+// setInterval(runScrape, 3600000); // Run it every hour (3600000 ms)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
